@@ -14,7 +14,6 @@ async function loadOrders(): Promise<OrderData[]> {
     .all();
 
   return data.map((order: any) => {
-    console.log(order.fields.order_placed);
     return {
       id: order.fields.order_id,
       orderPlaced: new Date(order.fields.order_placed),
