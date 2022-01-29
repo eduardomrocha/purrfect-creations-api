@@ -1,26 +1,45 @@
 import { MetricsData } from "../types/metrics";
-import IModel from "../interfaces/model";
+import { OrderData } from "../types/order";
 
 export class Metrics {
-  constructor(public model: IModel) {}
+  constructor() {}
 
-  public async run(): Promise<MetricsData> {
-    const totalOrders = await this.model.countBy(``);
-    const totalOrdersInProgress = await this.model.countBy(
-      `order_status = 'in_progress'`
-    );
-    const totalOrdersThisMonth = await this.model.countBy(
-      `MONTH(order_placed) = ${new Date().getMonth()}`
-    );
-    const revenue = await this.model.revenue();
-    const lastOrders = await this.model.lastOrders();
+  public totalOrders(orders: OrderData[]): number {
+    return orders.length;
+  }
 
+  public totalOrdersByStatus(orders: OrderData[], status: string): number {
+    return orders.filter((order) => order.orderStatus === status).length;
+  }
+
+  public totalOrdersThisMonth(orders: OrderData[]): number {
+    const thisMonth = new Date().getMonth();
+    const thisYear = new Date().getFullYear();
+    const ordersThisMonth = orders.filter(
+      (order) =>
+        order.orderPlaced.getMonth() === thisMonth &&
+        order.orderPlaced.getFullYear() === thisYear
+    );
+    return ordersThisMonth.length;
+  }
+
+  public revenue(orders: OrderData[]): number {
+    return orders.reduce((acc, order) => {
+      return acc + order.price;
+    }, 0);
+  }
+
+  public lastOrders(orders: OrderData[], quatity: number): OrderData[] {
+    return orders.slice(0, quatity);
+  }
+
+  public async run(orders: OrderData[]): Promise<MetricsData> {
     const metrics: MetricsData = {
-      totalOrders,
-      totalOrdersThisMonth,
-      totalOrdersInProgress,
-      revenue,
-      recentOrders: lastOrders,
+      totalOrders: this.totalOrders(orders),
+      totalOrdersThisMonth: this.totalOrdersThisMonth(orders),
+      totalOrdersInProgress: this.totalOrdersByStatus(orders, "in_progress"),
+      revenue: this.revenue(orders),
+      recentOrders: this.lastOrders(orders, 5),
     };
 
     return metrics;

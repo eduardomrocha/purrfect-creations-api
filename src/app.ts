@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import routes from "./routes";
+import { loadOrders } from "./services/orders";
 
 const app = express();
 
@@ -11,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(routes);
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+loadOrders().then((orders) => {
+  app.set("orders", orders);
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}`)
+  );
+});
