@@ -33,6 +33,16 @@ export class Metrics {
     }, 0);
   }
 
+  public expectedRevenue(orders: OrderData[]): number {
+    return orders.reduce((acc, order) => {
+      if (order.orderStatus === "cancelled") {
+        return acc;
+      }
+
+      return acc + order.price;
+    }, 0);
+  }
+
   public lastOrders(orders: OrderData[], quatity: number): OrderData[] {
     return orders.slice(0, quatity);
   }
@@ -43,6 +53,7 @@ export class Metrics {
       totalOrdersThisMonth: this.totalOrdersThisMonth(orders),
       totalOrdersInProgress: this.totalOrdersByStatus(orders, "in_progress"),
       revenue: this.revenue(orders),
+      expectedRevenue: this.expectedRevenue(orders),
       recentOrders: this.lastOrders(orders, 5),
     };
 

@@ -5,5 +5,6 @@ export type MetricsData = {
   totalOrdersThisMonth: number;
   totalOrdersInProgress: number;
   revenue: number;
+  expectedRevenue: number;
   recentOrders: OrderData[];
 };
