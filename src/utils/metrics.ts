@@ -25,7 +25,11 @@ export class Metrics {
 
   public revenue(orders: OrderData[]): number {
     return orders.reduce((acc, order) => {
-      return acc + order.price;
+      if (order.orderStatus === "shipped") {
+        return acc + order.price;
+      }
+
+      return acc;
     }, 0);
   }
 
